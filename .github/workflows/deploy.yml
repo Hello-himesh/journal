@@ -1,0 +1,28 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ master ]  # Change to 'master' if needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Allows action to push to gh-pages
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Move /public to root
+        run: |
+          # Move files from /public to root
+          mv public/ .temp_public/
+          rm -rf *  # Clear root (except .git, .github)
+          mv .temp_public/* .
+          rm -rf .temp_public
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
